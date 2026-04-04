@@ -41,10 +41,10 @@ class AuthController extends Controller
     }
 
     //otp check and finaly store user data 
-    public function otpStore(Request $request){
+    public function otpCheck(Request $request){
         $otp = Cache::get('otp');
         $userData = Cache::get('userData');
-        if($otp === $request->otp){
+        if($otp == $request->otp){
             // User তৈরি করুন
             User::create($userData);
 
@@ -52,13 +52,33 @@ class AuthController extends Controller
             Cache::forget('otp');
             Cache::forget('userData');
 
-            return view('login');
+            return redirect()->route('login');
         }
         return back()->withErrors(['otp' => 'OTP সঠিক হয়নি']);
+    }
+
+    //resend otp
+    public function resendOtp(SmsService $message){
+        $userData =Cache::get('userData');
+        if($userData){
+            $phone = $userData['phone'];
+            $otp   = random_int(100000, 999999);
+            Cache::put('otp', $otp, now()->addMinutes(10));
+
+            $message->send($phone, $otp);
+
+            return redirect()->route('otp.view');
+        }
+        return redirect()->route('registration');
     }
 
     //login view
     public function login(){
         return view('login');
+    }
+
+    //loged In
+    public function logedIn(){
+        
     }
 }

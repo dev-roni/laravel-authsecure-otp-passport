@@ -6,10 +6,10 @@ class SmsService
 {
     public function send($phone, $otp)
     {
-        $url = "http://api.greenweb.com.bd/api.php";
+        $url   = env('SMS_URL');
 
         $data = [
-            'token'   => '119011859261764853166111c7be6ff21458b3c6fc41fd02c9773', // <- আপনার টোকেন বসাবেন
+            'token'   => env('SMS_TOKEN'), // <- আপনার টোকেন বসাবেন
             'to'      => $phone,
             'message' => "Your OTP is: $otp",
         ];

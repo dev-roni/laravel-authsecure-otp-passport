@@ -49,7 +49,7 @@ body {
             </form>
 
             <p class="text-center mt-3">
-                Don't have account? <a href="/register" class="text-white">Register</a>
+                Don't have account? <a href="{{route('registration')}}" class="text-white">Register</a>
             </p>
 
         </div>

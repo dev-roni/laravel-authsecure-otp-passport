@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('otp_code');
-            $table->timestamps('expires_at');
+            $table->date('expires_at');
             $table->timestamps();
         });
     }

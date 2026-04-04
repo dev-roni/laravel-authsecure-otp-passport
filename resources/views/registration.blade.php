@@ -29,7 +29,7 @@
             
             <h3 class="text-center mb-4">🔐 AuthSecure Register</h3>
 
-            <form method="POST" action="{{route('otp')}}">
+            <form method="POST" action="{{route('register')}}">
                 @csrf
 
                 <div class="mb-3">

@@ -33,7 +33,6 @@ body {
 
             <h4 class="mb-2">🔐 OTP Verification</h4>
             <p class="text-muted">Enter the 6-digit code sent to your phone</p>
-            <p class="text-muted">just for trial your otp is : {{$otp}}</p>
 
             {{-- ✅ Error message --}}
             @if ($errors->any())

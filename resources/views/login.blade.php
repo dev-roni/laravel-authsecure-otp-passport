@@ -34,18 +34,30 @@ body {
         <div class="auth-card p-4 shadow-lg">
 
             <h3 class="text-center mb-4">AuthSecure</h3>
-
-            <form method="POST" action="/login">
+            {{-- ✅ Error message --}}
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            <form method="POST" action="{{route('login.success')}}">
                 @csrf
-
-                <input type="email" name="email" class="form-control mb-3" placeholder="Email">
+                <div>
+                    <input type="email" name="email" value="{{old('email')}}" class="form-control mb-3" placeholder="Email">
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <div class="input-group mb-3">
                     <input type="password" id="password" name="password" class="form-control" placeholder="Password">
                     <button type="button" class="btn btn-light" onclick="togglePassword()">👁</button>
+                    @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <button class="btn btn-custom w-100">Login</button>
+                <button type="submit" class="btn btn-custom w-100">Login</button>
             </form>
 
             <p class="text-center mt-3">

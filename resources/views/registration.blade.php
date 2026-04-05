@@ -33,18 +33,37 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{old('name')}}" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your name">
+                    <label class="form-label">Name</label>
+                    <input type="text"  name="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror">
+                    
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
                     <label>Email</label>
                     <input type="email" name="email" value="{{old('email')}}" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email">
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
                     <label>Phone</label>
                     <input type="text" name="phone" value="{{old('phone')}}" class="form-control @error('phone') is-invalid @enderror" placeholder="01XXXXXXXXX">
+                    @error('phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <label for="password">Password</label>
+                <div class="input-group mb-3">
+                    <input type="password" name="password" id="password" value="{{old('password')}}" class="form-control @error('password') is-invalid @enderror" placeholder="Password">
+                    <button type="button" class="btn btn-light" onclick="togglePassword()">👁</button>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">
@@ -59,6 +78,11 @@
         </div>
     </div>
 </div>
-
+<script>
+function togglePassword() {
+    let pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+}
+</script>
 </body>
 </html>

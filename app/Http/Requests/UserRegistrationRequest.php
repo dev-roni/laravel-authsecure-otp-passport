@@ -26,6 +26,7 @@ class UserRegistrationRequest extends FormRequest
             'name'  => 'required|string|min:3|max:50',
             'email' => 'required|email|unique:users,email|max:55',
             'phone' => 'required|string|unique:users,phone|regex:/^01\d{9}$/',
+            'password' => 'required|string|min:8|max:20',
         ];
     }
 
@@ -43,7 +44,11 @@ class UserRegistrationRequest extends FormRequest
 
             'phone.required' => 'ফোন নম্বর দেওয়া আবশ্যক',
             'phone.unique'   => 'এই ফোন নম্বর আগেই ব্যবহার হয়েছে',
-            'phone.regex'   => '01 দিয়ে শুরু করতে হবে',
+            'phone.regex'   => '01 দিয়ে শুরু কর এবং ভেলিড নাম্বার দাও',
+
+            'password.required'  => 'পাসওয়ার্ড দেওয়া আবশ্যক',
+            'password.min'       => 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে',
+            'password.max'       => 'পাসওয়ার্ড সর্বোচ্চ ২০ অক্ষরের হতে হবে',
         ];
     }
 }

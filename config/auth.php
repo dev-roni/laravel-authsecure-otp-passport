@@ -44,6 +44,12 @@ return [
         ],
     ],
 
+    'guards' => [
+        'api' => [
+            'driver'   => 'passport', // ✅ token → passport
+            'provider' => 'users',
+        ],
+    ],
     /*
     |--------------------------------------------------------------------------
     | User Providers

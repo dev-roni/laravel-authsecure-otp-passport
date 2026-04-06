@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\web;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -14,11 +14,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    //registration view
-    public function registration(){
-        return view('registration');
-    }
-
     //store user data in cache
     public function register(UserRegistrationRequest $request,SmsService $message){
         
@@ -36,17 +31,10 @@ class AuthController extends Controller
         // $phone = $validdata['phone'];
         // $message->send($phone, $otp);
 
-        return redirect()->route('otp.view');
-    }
-
-    //otp view
-    public function otp(){
-        if(Cache::has('userData') && Cache::get('otp')){
-            return view('otp');
-        }
-        else{
-            return back();
-        }
+        return response()->json([
+            'status'  => true,
+            'message' => 'OTP পাঠানো হয়েছে',
+        ], 200);
     }
 
     //otp check and finaly store user data 
@@ -55,17 +43,35 @@ class AuthController extends Controller
         $otp = Cache::get('otp');
         $userData = Cache::get('userData');
 
+        //cache check
+        if (!$userData || !$otp) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Session শেষ হয়ে গেছে, আবার চেষ্টা করুন',
+            ], 401);
+        }
+
         if($otp == $request->otp){
             // User তৈরি করুন
-            User::create($userData);
+            $user = User::create($userData);
+
+            //create tocken
+            $token = $user->createToken('auth_token')->accessToken;
 
             // Cache মুছে দিন
             Cache::forget('otp');
             Cache::forget('userData');
 
-            return redirect()->route('login');
+            return response()->json([
+                'status' => true,
+                'token'  => $token,
+                'user'   => $user,
+            ], 201);
         }
-        return back()->withErrors(['otp' => 'OTP IS WRONG']);
+        return response()->json([
+            'status'  => false,
+            'message' => 'OTP সঠিক নয়',
+        ], 401);
     }
 
     //resend otp
@@ -85,31 +91,14 @@ class AuthController extends Controller
             // $phone = $userData['phone'];
             // $message->send($phone, $otp);
 
-            return redirect()->route('otp.view');
+            return response()->json([
+                'status'  => true,
+                'message' => 'OTP পাঠানো হয়েছে',
+            ], 200);
         }
-        return redirect()->route('registration');
-    }
-
-    //login view
-    public function login(){
-        return view('login');
-    }
-
-    //loged In
-    public function logedIn(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|string',
-            'password' => 'required|string',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return 'login successfull';
-        }
-
-        return back()->withErrors(['error' => 'email or password is incorrect']);
+        return response()->json([
+            'status'  => false,
+            'message' => 'OTP পাঠানো যায়নি',
+        ], 401);
     }
 }

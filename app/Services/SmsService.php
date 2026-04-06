@@ -6,10 +6,10 @@ class SmsService
 {
     public function send($phone, $otp)
     {
-        $url   = env('SMS_URL');
+        $url   = env('SMS_URL'); //<-add your sms api in env
 
         $data = [
-            'token'   => env('SMS_TOKEN'), // <- আপনার টোকেন বসাবেন
+            'token'   => env('SMS_TOKEN'), //  <-sms server access token add in env
             'to'      => $phone,
             'message' => "Your OTP is: $otp",
         ];

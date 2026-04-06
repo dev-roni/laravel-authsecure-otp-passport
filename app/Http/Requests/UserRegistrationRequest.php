@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRegistrationRequest extends FormRequest
@@ -28,6 +30,18 @@ class UserRegistrationRequest extends FormRequest
             'phone' => 'required|string|unique:users,phone|regex:/^01\d{9}$/',
             'password' => 'required|string|min:8|max:20',
         ];
+    }
+
+    //এপআই এর জন্য
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'status'  => false,
+                'message' => 'Validation Error',
+                'errors'  => $validator->errors(),
+            ], 422)
+        );
     }
 
     public function messages(): array

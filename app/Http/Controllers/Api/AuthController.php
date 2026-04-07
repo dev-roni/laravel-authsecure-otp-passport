@@ -101,4 +101,49 @@ class AuthController extends Controller
             'message' => 'OTP পাঠানো যায়নি',
         ], 401);
     }
+
+    // Login
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $user  = Auth::user();
+            $token = $user->createToken('auth_token')->accessToken;
+
+            return response()->json([
+                'status' => true,
+                'token'  => $token,
+                'user'   => $user,
+            ], 200);
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Email or Password is incorrect',
+        ], 401);
+    }
+
+    // Logged in user
+    public function user(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'user'   => $request->user(),
+        ], 200);
+    }
+
+     // Logout
+    public function logout(Request $request)
+    {
+        //$request->user()->token()->revoke();
+        $request->user()->token()->delete();
+        return response()->json([
+            'status'  => true,
+            'message' => 'Logout successfuly',
+        ], 200);
+    }
 }

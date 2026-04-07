@@ -6,10 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Mail\PasswordResetMail;
 use App\Mail\OtpMail;
 use App\Services\SmsService;
 use App\Http\Requests\UserRegistrationRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -145,5 +152,59 @@ class AuthController extends Controller
             'status'  => true,
             'message' => 'Logout successfuly',
         ], 200);
+    }
+
+    //forgot password request
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+
+        $token = Str::random(6);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token'      => bcrypt($token),
+                'created_at' => now(),
+            ]
+        );
+
+        Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Password reset token পাঠানো হয়েছে',
+        ], 200);
+
+    }
+
+    //reset password
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:8|',
+        ]);
+
+        //  Token মিলিয়ে password update করে
+        $status = Password::reset(
+            $request->only('email', 'password', 'token'),
+            function ($user, $password) {
+                $user->password = bcrypt($password);
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Password সফলভাবে পরিবর্তন হয়েছে',
+            ], 200);
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Token সঠিক নয় বা মেয়াদ শেষ',
+        ], 400);
     }
 }

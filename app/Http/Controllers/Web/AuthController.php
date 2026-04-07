@@ -112,4 +112,50 @@ class AuthController extends Controller
 
         return back()->withErrors(['error' => 'email or password is incorrect']);
     }
+
+    //password reset
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        // Token তৈরি করে email পাঠায়
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return view();
+        }
+
+        return back()->with('error','email not found');
+    }
+
+    //reset password
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        //  Token মিলিয়ে password update করে
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = bcrypt($password);
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Password সফলভাবে পরিবর্তন হয়েছে',
+            ], 200);
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Token সঠিক নয় বা মেয়াদ শেষ',
+        ], 400);
+    }
 }

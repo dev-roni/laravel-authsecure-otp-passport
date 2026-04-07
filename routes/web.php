@@ -10,3 +10,5 @@ Route::post('otp',[AuthController::class,'otpCheck'])->name('otp');
 Route::post('resend',[AuthController::class,'resendOtp'])->name('resend.otp');
 Route::get('login',[AuthController::class,'login'])->name('login');
 Route::post('login',[AuthController::class,'logedIn'])->name('login.success');
+Route::post('forgot-password',[AuthController::class,'forgotPassword'])->name('password.reset');
+Route::post('reset-password',[AuthController::class,'resetPassword'])->name('password.set');

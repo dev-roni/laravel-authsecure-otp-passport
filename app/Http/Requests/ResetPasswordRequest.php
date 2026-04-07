@@ -1,0 +1,49 @@
+<?php
+namespace App\Http\Requests;
+
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
+class ResetPasswordRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'email' => 'required|email|exists:users,email',
+            'token'    => 'required',
+            'password' => 'required|min:8|',
+        ];
+    }
+
+    // API এর জন্য
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'status'  => false,
+                'message' => 'Validation Error',
+                'errors'  => $validator->errors(),
+            ], 422)
+        );
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'ইমেইল দেওয়া আবশ্যক',
+            'email.email'    => 'সঠিক ইমেইল ফরম্যাট দিন',
+            'email.exists'   => 'এই ইমেইল পাওয়া যায়নি',
+
+            'token.required' => 'টোকেন দেওয়া আবশ্যক',
+
+            'password.required' => 'পাসওয়ার্ড দেওয়া আবশ্যক',
+            'password.min' => 'পাসওয়ার্ড অবশ্যই ৮ অক্ষরের বেশি হতে হবে',
+        ];
+    }
+}

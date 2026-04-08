@@ -33,7 +33,7 @@ class User extends Authenticatable
     {
         $url = url('/reset-password/' . $token . '?email=' . $this->email);
 
-        Mail::to($this->email)->send(new PasswordResetMail($url, $token, $this->email));
+        Mail::to($this->email)->queue(new PasswordResetMail($url, $token, $this->email));
     }
     /**
      * The attributes that should be hidden for serialization.

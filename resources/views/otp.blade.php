@@ -32,7 +32,7 @@ body {
         <div class="card shadow-lg p-4 text-center">
 
             <h4 class="mb-2">🔐 OTP Verification</h4>
-            <p class="text-muted">Enter the 6-digit code sent to your phone</p>
+            <p class="text-muted">Enter the 6-digit code sent to your email</p>
             
 
             {{-- ✅ Error message --}}

@@ -32,7 +32,7 @@ class AuthController extends Controller
         
         //otp send by email
         $email = $validdata['email'];
-        Mail::to($email)->send(new OtpMail($otp));
+        Mail::to($email)->queue(new OtpMail($otp));
 
         //otp send by phone
         // $phone = $validdata['phone'];

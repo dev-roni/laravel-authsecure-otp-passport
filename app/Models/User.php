@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
 
 class User extends Authenticatable
 {
@@ -26,6 +28,13 @@ class User extends Authenticatable
         'phone'
     ];
 
+    //send email 
+    public function sendPasswordResetNotification($token)
+    {
+        $url = url('/reset-password/' . $token . '?email=' . $this->email);
+
+        Mail::to($this->email)->send(new PasswordResetMail($url, $token, $this->email));
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

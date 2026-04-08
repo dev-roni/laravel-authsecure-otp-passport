@@ -168,7 +168,8 @@ class AuthController extends Controller
             ]
         );
 
-        Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
+        $url = url('/reset-password/' . $token . '?email=' . $request->email);
+        Mail::to($request->email)->send(new PasswordResetMail($url,$token,$request->email));
 
         return response()->json([
             'status'  => true,

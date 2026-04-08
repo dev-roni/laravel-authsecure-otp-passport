@@ -22,13 +22,18 @@ class ForgotPasswordRequest extends FormRequest
     // API এর জন্য
     protected function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(
-            response()->json([
-                'status'  => false,
-                'message' => 'Validation Error',
-                'errors'  => $validator->errors(),
-            ], 422)
-        );
+        if ($this->expectsJson() or $this->is('api/*')) {
+            throw new HttpResponseException(
+                response()->json([
+                    'status'  => false,
+                    'message' => 'Validation Error',
+                    'errors'  => $validator->errors(),
+                ], 422)
+            );
+        }
+
+        // Web request হলে default behaviour
+        parent::failedValidation($validator);
     }
 
     public function messages(): array

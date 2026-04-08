@@ -7,9 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Mail\OtpMail;
 use App\Services\SmsService;
 use App\Http\Requests\UserRegistrationRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -45,7 +51,7 @@ class AuthController extends Controller
             return view('otp');
         }
         else{
-            return back();
+            return redirect()->route('registration');
         }
     }
 
@@ -55,7 +61,7 @@ class AuthController extends Controller
         $otp = Cache::get('otp');
         $userData = Cache::get('userData');
 
-        if($otp == $request->otp){
+        if($otp && $otp == $request->otp){
             // User তৈরি করুন
             User::create($userData);
 
@@ -63,7 +69,7 @@ class AuthController extends Controller
             Cache::forget('otp');
             Cache::forget('userData');
 
-            return redirect()->route('login');
+            return redirect()->route('login')->with('success','user registered successfully');
         }
         return back()->withErrors(['otp' => 'OTP IS WRONG']);
     }
@@ -107,13 +113,18 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return 'login successfull';
+            return view('success')->with('user',auth()->user());
         }
 
-        return back()->withErrors(['error' => 'email or password is incorrect']);
+        return back()->withInput()->withErrors(['error' => 'email or password is incorrect']);
     }
 
-    //password reset
+    //forgot password view
+    public function forgotPasswordView(){
+        return view('forgotPassword');
+    }
+
+    //forgot  password
     public function forgotPassword(ForgotPasswordRequest $request)
     {
         // Token তৈরি করে email পাঠায়
@@ -121,25 +132,35 @@ class AuthController extends Controller
             $request->only('email')
         );
 
+        $email = $request->email;
         if ($status === Password::RESET_LINK_SENT) {
-            return view();
+            return view('success',compact('email'));
         }
 
-        return back()->with('error','email not found');
+        return back()->with('error','email not send');
     }
 
+    // Reset Password View
+    public function resetPasswordView(Request $request, string $token)
+    {
+        return view('reset-password', [
+            'token' => $token,
+            'email' => $request->email,
+        ]);
+    } 
+
     //reset password
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
         $request->validate([
             'token'    => 'required',
             'email'    => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:8|max:20',
         ]);
 
         //  Token মিলিয়ে password update করে
         $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $request->only('email', 'password', 'token'),
             function ($user, $password) {
                 $user->password = bcrypt($password);
                 $user->save();
@@ -147,15 +168,9 @@ class AuthController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return response()->json([
-                'status'  => true,
-                'message' => 'Password সফলভাবে পরিবর্তন হয়েছে',
-            ], 200);
+            return redirect()->route('login')->with('success','Password update successfully');
         }
 
-        return response()->json([
-            'status'  => false,
-            'message' => 'Token সঠিক নয় বা মেয়াদ শেষ',
-        ], 400);
+        return back()->withErrors(['token' => 'Token invalid']);
     }
 }

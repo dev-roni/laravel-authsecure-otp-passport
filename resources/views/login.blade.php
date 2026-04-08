@@ -40,6 +40,12 @@ body {
                     {{ $errors->first() }}
                 </div>
             @endif
+            {{-- Success Message --}}
+            @if(session('success'))
+                <div class="alert alert-success text-center">
+                    {{ session('success') }}
+                </div>
+            @endif
             <form method="POST" action="{{route('login.success')}}">
                 @csrf
                 <div>
@@ -61,7 +67,12 @@ body {
             </form>
 
             <p class="text-center mt-3">
-                Don't have account? <a href="{{route('registration')}}" class="text-white">Register</a>
+                Don't have an account? 
+                <a href="{{ route('registration') }}" class="text-white">Register</a>
+            </p>
+
+            <p class="text-center">
+                <a href="{{ route('forgot.password') }}" class="text-white">Forgot Password?</a>
             </p>
 
         </div>

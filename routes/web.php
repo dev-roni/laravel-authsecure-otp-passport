@@ -19,8 +19,7 @@ Route::post('reset-password',[AuthController::class,'resetPassword'])->name('pas
 Route::get('success',[AuthController::class,'success'])->name('success');
 
 // Google o oath2
-Route::get('/auth/google',          [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 
 // Facebook o oath2
 Route::get('/auth/facebook',          [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');

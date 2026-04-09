@@ -17,6 +17,7 @@ use App\Services\SmsService;
 use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -207,5 +208,18 @@ class AuthController extends Controller
             'status'  => false,
             'message' => 'Token সঠিক নয় বা মেয়াদ শেষ',
         ], 400);
+    }
+
+    public function redirectToGoogle()
+    {
+        $url = Socialite::driver('google')
+                        ->stateless() // ✅ API তে stateless লাগবে
+                        ->redirect()
+                        ->getTargetUrl();
+
+        return response()->json([
+            'status' => true,
+            'url'    => $url,
+        ]);
     }
 }

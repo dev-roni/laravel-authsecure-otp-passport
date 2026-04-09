@@ -171,6 +171,10 @@ class AuthController extends Controller
             return redirect()->route('login')->with('success','Password update successfully');
         }
 
-        return back()->withErrors(['token' => 'Token invalid']);
+        return back()->withErrors(['error' => 'Token invalid']);
+    }
+
+    public function success(){
+        return view('success');
     }
 }

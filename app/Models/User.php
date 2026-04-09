@@ -25,7 +25,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone'
+        'phone',
+        'avatar',
+        'google_id'
     ];
 
     //send email 

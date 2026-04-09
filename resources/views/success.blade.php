@@ -22,6 +22,18 @@ body {
     font-size: 60px;
     color: #28a745;
 }
+.profile-picture-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid var(--primary-light);
+}
 </style>
 </head>
 
@@ -35,23 +47,28 @@ body {
 
             <h4 class="mb-2">Success!</h4>
 
-            @if(request()->routeIs('login.success'))
+            @if(!request()->routeIs('token.sent'))
                 <p class="text-muted">
                 Login successfully
                 </p>
+
+                <div class="profile-picture-container mx-auto">
+                    <img src="{{ auth()->user()->avatar ?? ''}}" alt="Profile Image" class="profile-picture" >
+                </div>
+
                 <div class="row mb-2">
                     <div class="col-4 fw-bold">Name:</div>
-                    <div class="col-8">{{ $user->name }}</div>
+                    <div class="col-8">{{ auth()->user()->name }}</div>
                 </div>
 
                 <div class="row mb-2">
                     <div class="col-4 fw-bold">Email:</div>
-                    <div class="col-8">{{ $user->email }}</div>
+                    <div class="col-8">{{ auth()->user()->email }}</div>
                 </div>
 
                 <div class="row mb-2">
                     <div class="col-4 fw-bold">Phone:</div>
-                    <div class="col-8">{{ $user->phone ?? 'N/A' }}</div>
+                    <div class="col-8">{{ auth()->user()->phone ?? 'N/A' }}</div>
                 </div>
             @endif
             @if(request()->routeIs('token.sent'))

@@ -36,8 +36,8 @@ body {
                 @csrf
 
                 <div class="mb-3">
-                    <input type="email" name="email" value="{{ old('email') }}" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your email" required>
-                    @error('name')
+                    <input type="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email" required>
+                    @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

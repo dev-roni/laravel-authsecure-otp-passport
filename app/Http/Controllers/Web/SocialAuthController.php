@@ -48,8 +48,40 @@ class SocialAuthController extends Controller
             return redirect()->route('success');
         }
         catch(Exception $e){
-            return redirect()->route('login')->withErrors();
+            return redirect()->route('login')->withErrors('error','login failed');
             
+        }
+    }
+
+    // Facebook এ Redirect
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    // Facebook Callback
+    public function handleFacebookCallback()
+    {
+        try {
+            $facebookUser = Socialite::driver('facebook')->user();
+
+            $user = User::updateOrCreate(
+                ['facebook_id' => $facebookUser->getId()],
+                [
+                    'name'        => $facebookUser->getName(),
+                    'email'       => $facebookUser->getEmail(),
+                    'avatar'      => $facebookUser->getAvatar(),
+                    'facebook_id' => $facebookUser->getId(),
+                ]
+            );
+
+            Auth::login($user);
+
+            return redirect()->route('success');
+
+        } catch (\Exception $e) {
+            return redirect()->route('login')
+                             ->withErrors(['error' => 'Facebook login failed']);
         }
     }
 }

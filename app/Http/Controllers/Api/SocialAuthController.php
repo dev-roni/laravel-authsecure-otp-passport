@@ -57,4 +57,54 @@ class SocialAuthController extends Controller
             ], 400);
         }
     }
+
+    // Facebook Redirect URL দিন
+    public function redirectToFacebook()
+    {
+        $url = Socialite::driver('facebook')
+                        ->stateless()
+                        ->redirect()
+                        ->getTargetUrl();
+
+        return response()->json([
+            'status' => true,
+            'url'    => $url,
+        ]);
+    }
+
+    // Facebook Callback — Token দিন
+    public function handleFacebookCallback()
+    {
+        try {
+            $facebookUser = Socialite::driver('facebook')
+                                     ->stateless()
+                                     ->user();
+
+            $user = User::updateOrCreate(
+                ['facebook_id' => $facebookUser->getId()],
+                [
+                    'name'        => $facebookUser->getName(),
+                    'email'       => $facebookUser->getEmail(),
+                    'avatar'      => $facebookUser->getAvatar(),
+                    'facebook_id' => $facebookUser->getId(),
+                ]
+            );
+
+            // Passport Token দিন
+            $token = $user->createToken('auth_token')->accessToken;
+
+            return response()->json([
+                'status' => true,
+                'token'  => $token,
+                'user'   => $user,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Facebook login failed',
+                'error'   => $e->getMessage(),
+            ], 400);
+        }
+    }
 }

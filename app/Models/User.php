@@ -28,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'avatar',
         'google_id'
+        'facebook_id',
     ];
 
     //send email 
